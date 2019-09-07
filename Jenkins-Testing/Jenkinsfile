@@ -32,8 +32,8 @@ node { lock('master') {
            sh 'ls -las'
            sh 'xcodebuild -scheme "Jenkins-Testing" -derivedDataPath Build-Archive/ -destination "platform=iOS Simulator,name=iPhone 8"'
            def data = readFile 'Jenkins-Testing/Info.plist'
-           def body = 'part1:\n\n${data}\n\npart 2:\n\n${data}'
-           echo data
+           def body = "part1:\n\n${data}\n\npart 2:\n\n${data}"
+           echo body
          }
        }
      }
