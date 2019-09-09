@@ -24,33 +24,32 @@ node { lock('master') {
                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'project']], submoduleCfg: [],
                  userRemoteConfigs: [[url: 'https://github.com/amreshkumar/jenkins-test.git']]])
     }
-   parallel build: {
-   stage('build') {
-       dir(WORKSPACE_DIR) {
-         // compile App
-         dir('project/Jenkins-Testing') {
-           sh 'ls -las'
-           sh 'xcodebuild -scheme "Jenkins-Testing" -derivedDataPath Build-Archive/ -destination "platform=iOS Simulator,name=iPhone 8"'
-           def data = readFile 'Jenkins-Testing/Info.plist'
-           def body = """
-           compiler warnings compared to release branch:
 
-           <pre>
-           ${FILE, path="'Jenkins-Testing/Info.plist'"}
-           </pre>
+       stage('build') {
+           dir(WORKSPACE_DIR) {
+             // compile App
+             dir('project/Jenkins-Testing') {
+               sh 'ls -las'
+               sh 'xcodebuild -scheme "Jenkins-Testing" -derivedDataPath Build-Archive/ -destination "platform=iOS Simulator,name=iPhone 8"'
+               def data = readFile 'Jenkins-Testing/Info.plist'
+               def body = """
+               compiler warnings compared to release branch:
 
-           compiler warnings by module:
+               <pre>
+               ${FILE, path="'Jenkins-Testing/Info.plist'"}
+               </pre>
 
-           <pre>
-           ${FILE, path="'Jenkins-Testing/Info.plist'"}
-           </pre>
-           """
-           echo body
+               compiler warnings by module:
+
+               <pre>
+               ${FILE, path="'Jenkins-Testing/Info.plist'"}
+               </pre>
+               """
+               echo body
+             }
+           }
          }
-       }
-     }
 
-  }, test: {
      stage('test') {
          dir(WORKSPACE_DIR) {
              dir('project/Jenkins-Testing') {
@@ -63,11 +62,6 @@ node { lock('master') {
              }
          }
        }
-  },
-  failFast: true
-  }
-
-
 
 
 
