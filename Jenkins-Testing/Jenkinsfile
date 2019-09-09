@@ -36,13 +36,13 @@ node { lock('master') {
                compiler warnings compared to release branch:
 
                <pre>
-               ${FILE, path="'Jenkins-Testing/Info.plist'"}
+               ${data}
                </pre>
 
                compiler warnings by module:
 
                <pre>
-               ${FILE, path="'Jenkins-Testing/Info.plist'"}
+               ${data}
                </pre>
                """
                echo body
