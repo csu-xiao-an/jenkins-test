@@ -24,44 +24,46 @@ node { lock('master') {
                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'project']], submoduleCfg: [],
                  userRemoteConfigs: [[url: 'https://github.com/amreshkumar/jenkins-test.git']]])
     }
+  }
 
-       stage('build') {
+  stage('build') {
+             dir(WORKSPACE_DIR) {
+               // compile App
+               dir('project/Jenkins-Testing') {
+                 sh 'ls -las'
+                 sh 'xcodebuild -scheme "Jenkins-Testing" -derivedDataPath Build-Archive/ -destination "platform=iOS Simulator,name=iPhone 8"'
+                 def data = readFile 'Jenkins-Testing/Info.plist'
+                 def body = """
+                 compiler warnings compared to release branch:
+
+                 <pre>
+                 ${data}
+                 </pre>
+
+                 compiler warnings by module:
+
+                 <pre>
+                 ${data}
+                 </pre>
+                 """
+                 echo body
+               }
+             }
+  }
+
+  stage('test') {
            dir(WORKSPACE_DIR) {
-             // compile App
-             dir('project/Jenkins-Testing') {
-               sh 'ls -las'
-               sh 'xcodebuild -scheme "Jenkins-Testing" -derivedDataPath Build-Archive/ -destination "platform=iOS Simulator,name=iPhone 8"'
-               def data = readFile 'Jenkins-Testing/Info.plist'
-               def body = """
-               compiler warnings compared to release branch:
-
-               <pre>
-               ${data}
-               </pre>
-
-               compiler warnings by module:
-
-               <pre>
-               ${data}
-               </pre>
-               """
-               echo body
-             }
+               dir('project/Jenkins-Testing') {
+                      try {
+                          result = sh 'xcodebuild -scheme "Jenkins-Testing" -destination "platform=iOS Simulator,name=iPhone 8" test'
+                      } catch (err) {
+                        echo "Catch block"
+                        sh "exit 1"
+                      }
+               }
            }
-         }
+  }
 
-     stage('test') {
-         dir(WORKSPACE_DIR) {
-             dir('project/Jenkins-Testing') {
-                    try {
-                        result = sh 'xcodebuild -scheme "Jenkins-Testing" -destination "platform=iOS Simulator,name=iPhone 8" test'
-                    } catch (err) {
-                      echo "Catch block"
-                      sh "exit 1"
-                    }
-             }
-         }
-       }
 
 
 
@@ -75,4 +77,5 @@ node { lock('master') {
       deleteDir()
     }
   }
+
 }}
